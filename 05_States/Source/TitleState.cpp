@@ -7,13 +7,14 @@
 
 TitleState::TitleState(StateStack& stack, Context context)
 : State(stack, context)
-, mText()
+, mFont("Media/Sansation.ttf")
+, mText(mFont)
 , mShowText(true)
 , mTextEffectTime(sf::Time::Zero)
 {
-	mBackgroundSprite.setTexture(context.textures->get(Textures::TitleScreen));
+	// mBackgroundSprite.setTexture(context.textures->get(Textures::TitleScreen));
 
-	mText.setFont(context.fonts->get(Fonts::Main));
+	// mText.setFont(context.fonts->get(Fonts::Main));
 	mText.setString("Press any key to start");
 	centerOrigin(mText);
 	mText.setPosition(context.window->getView().getSize() / 2.f);
@@ -22,7 +23,7 @@ TitleState::TitleState(StateStack& stack, Context context)
 void TitleState::draw()
 {
 	sf::RenderWindow& window = *getContext().window;
-	window.draw(mBackgroundSprite);
+	// window.draw(mBackgroundSprite);
 
 	if (mShowText)
 		window.draw(mText);
@@ -44,7 +45,7 @@ bool TitleState::update(sf::Time dt)
 bool TitleState::handleEvent(const sf::Event& event)
 {
 	// If any key is pressed, trigger the next screen
-	if (event.type == sf::Event::KeyPressed)
+	if (event.is<sf::Event::KeyPressed>())
 	{
 		requestStackPop();
 		requestStackPush(States::Menu);

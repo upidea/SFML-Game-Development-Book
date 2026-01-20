@@ -26,10 +26,10 @@ struct AircraftMover
 Player::Player()
 {
 	// Set initial key bindings
-	mKeyBinding[sf::Keyboard::Left] = MoveLeft;
-	mKeyBinding[sf::Keyboard::Right] = MoveRight;
-	mKeyBinding[sf::Keyboard::Up] = MoveUp;
-	mKeyBinding[sf::Keyboard::Down] = MoveDown;
+	mKeyBinding[sf::Keyboard::Key::Left] = MoveLeft;
+	mKeyBinding[sf::Keyboard::Key::Right] = MoveRight;
+	mKeyBinding[sf::Keyboard::Key::Up] = MoveUp;
+	mKeyBinding[sf::Keyboard::Key::Down] = MoveDown;
 
 	// Set initial action bindings
 	initializeActions();	
@@ -39,15 +39,12 @@ Player::Player()
 		pair.second.category = Category::PlayerAircraft;
 }
 
-void Player::handleEvent(const sf::Event& event, CommandQueue& commands)
+void Player::handleEvent(const sf::Keyboard::Key pressedKey, CommandQueue& commands)
 {
-	if (event.type == sf::Event::KeyPressed)
-	{
-		// Check if pressed key appears in key binding, trigger command if so
-		auto found = mKeyBinding.find(event.key.code);
-		if (found != mKeyBinding.end() && !isRealtimeAction(found->second))
-			commands.push(mActionBinding[found->second]);
-	}
+	// Check if pressed key appears in key binding, trigger command if so
+	auto found = mKeyBinding.find(pressedKey);
+	if (found != mKeyBinding.end() && !isRealtimeAction(found->second))
+		commands.push(mActionBinding[found->second]);
 }
 
 void Player::handleRealtimeInput(CommandQueue& commands)
@@ -84,7 +81,7 @@ sf::Keyboard::Key Player::getAssignedKey(Action action) const
 			return pair.first;
 	}
 
-	return sf::Keyboard::Unknown;
+	return sf::Keyboard::Key::Unknown;
 }
 
 void Player::initializeActions()

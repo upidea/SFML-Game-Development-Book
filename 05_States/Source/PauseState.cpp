@@ -9,23 +9,24 @@
 
 PauseState::PauseState(StateStack& stack, Context context)
 : State(stack, context)
-, mBackgroundSprite()
-, mPausedText()
-, mInstructionText()
+, mFont("Media/Sansation.ttf")
+// , mBackgroundSprite()
+, mPausedText(mFont)
+, mInstructionText(mFont)
 {
-	sf::Font& font = context.fonts->get(Fonts::Main);
+	// sf::Font& font = context.fonts->get(Fonts::Main);
 	sf::Vector2f viewSize = context.window->getView().getSize();
 
-	mPausedText.setFont(font);
+	// mPausedText.setFont(font);
 	mPausedText.setString("Game Paused");	
 	mPausedText.setCharacterSize(70);
 	centerOrigin(mPausedText);
-	mPausedText.setPosition(0.5f * viewSize.x, 0.4f * viewSize.y);
+	mPausedText.setPosition({0.5f * viewSize.x, 0.4f * viewSize.y});
 
-	mInstructionText.setFont(font);
+	// mInstructionText.setFont(font);
 	mInstructionText.setString("(Press Backspace to return to the main menu)");	
 	centerOrigin(mInstructionText);
-	mInstructionText.setPosition(0.5f * viewSize.x, 0.6f * viewSize.y);
+	mInstructionText.setPosition({0.5f * viewSize.x, 0.6f * viewSize.y});
 }
 
 void PauseState::draw()
@@ -49,16 +50,19 @@ bool PauseState::update(sf::Time)
 
 bool PauseState::handleEvent(const sf::Event& event)
 {
-	if (event.type != sf::Event::KeyPressed)
-		return false;
+	// if (event.type != sf::Event::KeyPressed)
+	// 	return false;
 
-	if (event.key.code == sf::Keyboard::Escape)
+	const auto* keyEvent = event.getIf<sf::Event::KeyPressed>();
+	if (keyEvent != nullptr)
+
+	if (keyEvent != nullptr && keyEvent->code == sf::Keyboard::Key::Escape)
 	{
 		// Escape pressed, remove itself to return to the game
 		requestStackPop();
 	}
 
-	if (event.key.code == sf::Keyboard::BackSpace)
+	if (keyEvent != nullptr && keyEvent->code == sf::Keyboard::Key::Backspace)
 	{
 		// Escape pressed, remove itself to return to the game
 		requestStateClear();

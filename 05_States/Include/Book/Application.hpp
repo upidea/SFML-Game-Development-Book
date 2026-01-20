@@ -9,6 +9,7 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/Window/Event.hpp>
 
 
 class Application
@@ -32,7 +33,8 @@ class Application
 
 		sf::RenderWindow		mWindow;
 		TextureHolder			mTextures;
-	  	FontHolder				mFonts;
+	  	// FontHolder				mFonts;
+		sf::Font				mFont;
 		Player					mPlayer;
 
 		StateStack				mStateStack;

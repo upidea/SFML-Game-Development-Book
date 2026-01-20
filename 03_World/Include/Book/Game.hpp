@@ -10,7 +10,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 
 
-class Game : private sf::NonCopyable
+class Game
 {
 	public:
 								Game();

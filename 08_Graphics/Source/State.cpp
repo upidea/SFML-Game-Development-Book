@@ -2,10 +2,9 @@
 #include <Book/StateStack.hpp>
 
 
-State::Context::Context(sf::RenderWindow& window, TextureHolder& textures, FontHolder& fonts, Player& player)
+State::Context::Context(sf::RenderWindow& window, TextureHolder& textures, Player& player)
 : window(&window)
 , textures(&textures)
-, fonts(&fonts)
 , player(&player)
 {
 }

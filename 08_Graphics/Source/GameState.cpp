@@ -3,7 +3,7 @@
 
 GameState::GameState(StateStack& stack, Context context)
 : State(stack, context)
-, mWorld(*context.window, *context.fonts)
+, mWorld(*context.window)
 , mPlayer(*context.player)
 {
 	mPlayer.setMissionStatus(Player::MissionRunning);
@@ -39,10 +39,13 @@ bool GameState::handleEvent(const sf::Event& event)
 {
 	// Game input handling
 	CommandQueue& commands = mWorld.getCommandQueue();
-	mPlayer.handleEvent(event, commands);
+
+	const auto* keyEvent = event.getIf<sf::Event::KeyPressed>();
+	if (keyEvent != nullptr)
+		mPlayer.handleEvent(*keyEvent, commands);
 
 	// Escape pressed, trigger the pause screen
-	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+	if (keyEvent != nullptr &&	keyEvent->code == sf::Keyboard::Key::Escape)
 		requestStackPush(States::Pause);
 
 	return true;

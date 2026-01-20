@@ -19,7 +19,7 @@ class PauseState : public State
 
 
 	private:
-		sf::Sprite			mBackgroundSprite;
+		sf::Font			mFont;
 		sf::Text			mPausedText;
 		GUI::Container 		mGUIContainer;
 };

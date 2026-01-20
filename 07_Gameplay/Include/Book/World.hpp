@@ -9,7 +9,6 @@
 #include <Book/CommandQueue.hpp>
 #include <Book/Command.hpp>
 
-#include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/View.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
@@ -23,10 +22,10 @@ namespace sf
 	class RenderWindow;
 }
 
-class World : private sf::NonCopyable
+class World
 {
 	public:
-		explicit							World(sf::RenderWindow& window, FontHolder& fonts);
+		explicit							World(sf::RenderWindow& window);
 		void								update(sf::Time dt);
 		void								draw();
 		
@@ -79,7 +78,6 @@ class World : private sf::NonCopyable
 		sf::RenderWindow&					mWindow;
 		sf::View							mWorldView;
 		TextureHolder						mTextures;
-		FontHolder&							mFonts;
 
 		SceneNode							mSceneGraph;
 		std::array<SceneNode*, LayerCount>	mSceneLayers;

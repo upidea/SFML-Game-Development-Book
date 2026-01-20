@@ -26,7 +26,7 @@ class Player
 	public:
 								Player();
 
-		void					handleEvent(const sf::Event& event, CommandQueue& commands);
+		void					handleEvent(const sf::Keyboard::Key pressedKey, CommandQueue& commands);
 		void					handleRealtimeInput(CommandQueue& commands);
 
 		void					assignKey(Action action, sf::Keyboard::Key key);

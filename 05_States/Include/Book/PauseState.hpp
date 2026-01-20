@@ -18,9 +18,10 @@ class PauseState : public State
 
 
 	private:
-		sf::Sprite			mBackgroundSprite;
+		// sf::Sprite			mBackgroundSprite;
 		sf::Text			mPausedText;
 		sf::Text			mInstructionText;
+		sf::Font			mFont;
 };
 
 #endif // BOOK_PAUSESTATE_HPP

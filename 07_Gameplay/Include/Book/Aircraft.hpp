@@ -3,11 +3,13 @@
 
 #include <Book/Entity.hpp>
 #include <Book/Command.hpp>
+#include <Book/CommandQueue.hpp>
 #include <Book/ResourceIdentifiers.hpp>
 #include <Book/Projectile.hpp>
 #include <Book/TextNode.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
 
 
 class Aircraft : public Entity
@@ -23,7 +25,7 @@ class Aircraft : public Entity
 
 
 	public:
-								Aircraft(Type type, const TextureHolder& textures, const FontHolder& fonts);
+								Aircraft(Type type, const TextureHolder& textures);
 
 		virtual unsigned int	getCategory() const;
 		virtual sf::FloatRect	getBoundingRect() const;

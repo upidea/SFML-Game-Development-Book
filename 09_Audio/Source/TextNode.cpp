@@ -4,9 +4,8 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 
     
-TextNode::TextNode(const FontHolder& fonts, const std::string& text)
+TextNode::TextNode(const std::string& text):mFont("Media/Sansation.ttf"), mText(mFont)
 {
-	mText.setFont(fonts.get(Fonts::Main));
 	mText.setCharacterSize(20);
 	setString(text);
 }

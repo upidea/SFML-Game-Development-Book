@@ -1,16 +1,16 @@
 #ifndef BOOK_SCENENODE_HPP
 #define BOOK_SCENENODE_HPP
 
-#include <SFML/System/NonCopyable.hpp>
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
 
 #include <vector>
 #include <memory>
 
 
-class SceneNode : public sf::Transformable, public sf::Drawable, private sf::NonCopyable
+class SceneNode : public sf::Transformable, public sf::Drawable
 {
 	public:
 		typedef std::unique_ptr<SceneNode> Ptr;

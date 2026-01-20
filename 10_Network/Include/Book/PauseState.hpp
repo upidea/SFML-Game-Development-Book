@@ -5,6 +5,7 @@
 #include <Book/Container.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
 
 
@@ -20,7 +21,8 @@ class PauseState : public State
 
 
 	private:
-		sf::Sprite			mBackgroundSprite;
+		// sf::Sprite			mBackgroundSprite;
+		sf::Font 			mFont;
 		sf::Text			mPausedText;
 		GUI::Container 		mGUIContainer;
 		bool				mLetUpdatesThrough;

@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <SFML/Graphics/RenderStates.hpp>
 
 
 SceneNode::SceneNode()

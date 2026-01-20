@@ -12,26 +12,23 @@
 const sf::Time Application::TimePerFrame = sf::seconds(1.f/60.f);
 
 Application::Application()
-: mWindow(sf::VideoMode(640, 480), "Menus", sf::Style::Close)
+: mWindow(sf::VideoMode({640, 480}), "Menus", sf::Style::Close)
 , mTextures()
-, mFonts()
+, mFont("Media/Sansation.ttf")
 , mPlayer()
-, mStateStack(State::Context(mWindow, mTextures, mFonts, mPlayer))
-, mStatisticsText()
+, mStateStack(State::Context(mWindow, mTextures, mPlayer))
+, mStatisticsText(mFont)
 , mStatisticsUpdateTime()
 , mStatisticsNumFrames(0)
 {
 	mWindow.setKeyRepeatEnabled(false);
-
-	mFonts.load(Fonts::Main, 	"Media/Sansation.ttf");
 
 	mTextures.load(Textures::TitleScreen,		"Media/Textures/TitleScreen.png");
 	mTextures.load(Textures::ButtonNormal,		"Media/Textures/ButtonNormal.png");
 	mTextures.load(Textures::ButtonSelected,	"Media/Textures/ButtonSelected.png");
 	mTextures.load(Textures::ButtonPressed,		"Media/Textures/ButtonPressed.png");
 
-	mStatisticsText.setFont(mFonts.get(Fonts::Main));
-	mStatisticsText.setPosition(5.f, 5.f);
+	mStatisticsText.setPosition({5.f, 5.f});
 	mStatisticsText.setCharacterSize(10u);
 
 	registerStates();
@@ -66,13 +63,11 @@ void Application::run()
 
 void Application::processInput()
 {
-	sf::Event event;
-	while (mWindow.pollEvent(event))
-	{
-		mStateStack.handleEvent(event);
-
-		if (event.type == sf::Event::Closed)
+	while (auto event = mWindow.pollEvent()) {
+		if (event->is<sf::Event::Closed>()) {
 			mWindow.close();
+		}
+		mStateStack.handleEvent(*event);
 	}
 }
 

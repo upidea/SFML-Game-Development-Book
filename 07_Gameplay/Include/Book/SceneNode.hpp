@@ -2,11 +2,11 @@
 #define BOOK_SCENENODE_HPP
 
 #include <Book/Category.hpp>
-
-#include <SFML/System/NonCopyable.hpp>
+#include <Book/CommandQueue.hpp>
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
 
 #include <vector>
 #include <set>
@@ -17,7 +17,7 @@
 struct Command;
 class CommandQueue;
 
-class SceneNode : public sf::Transformable, public sf::Drawable, private sf::NonCopyable
+class SceneNode : public sf::Transformable, public sf::Drawable
 {
 	public:
 		typedef std::unique_ptr<SceneNode> Ptr;

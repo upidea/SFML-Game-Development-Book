@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 
 
-class Game : private sf::NonCopyable
+class Game
 {
 	public:
 								Game();

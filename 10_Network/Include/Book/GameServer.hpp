@@ -2,7 +2,7 @@
 #define BOOK_GAMESERVER_HPP
 
 #include <SFML/System/Vector2.hpp>
-#include <SFML/System/Thread.hpp>
+// #include <SFML/System/Thread.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/System/Sleep.hpp>
 #include <SFML/Graphics/Rect.hpp>
@@ -12,6 +12,7 @@
 #include <vector>
 #include <memory>
 #include <map>
+#include <thread>
 
 
 class GameServer
@@ -20,9 +21,9 @@ class GameServer
 		explicit							GameServer(sf::Vector2f battlefieldSize);
 											~GameServer();
 
-		void								notifyPlayerSpawn(sf::Int32 aircraftIdentifier);
-		void								notifyPlayerRealtimeChange(sf::Int32 aircraftIdentifier, sf::Int32 action, bool actionEnabled);
-		void								notifyPlayerEvent(sf::Int32 aircraftIdentifier, sf::Int32 action);
+		void								notifyPlayerSpawn(int aircraftIdentifier);
+		void								notifyPlayerRealtimeChange(int aircraftIdentifier, int action, bool actionEnabled);
+		void								notifyPlayerEvent(int aircraftIdentifier, int action);
 
 
 	private:
@@ -33,7 +34,7 @@ class GameServer
 
 			sf::TcpSocket			socket;
 			sf::Time				lastPacketTime;
-			std::vector<sf::Int32>	aircraftIdentifiers;
+			std::vector<int>	aircraftIdentifiers;
 			bool					ready;
 			bool					timedOut;
 		};
@@ -42,9 +43,9 @@ class GameServer
 		struct AircraftInfo
 		{
 			sf::Vector2f				position;
-			sf::Int32					hitpoints;
-			sf::Int32                   missileAmmo;
-			std::map<sf::Int32, bool>	realtimeActions;
+			int					hitpoints;
+			int                   missileAmmo;
+			std::map<int, bool>	realtimeActions;
 		};
 
 		// Unique pointer to remote peers
@@ -70,7 +71,8 @@ class GameServer
 
 
 	private:
-		sf::Thread							mThread;
+		// sf::Thread							mThread;
+		std::thread							mThread;
 		sf::Clock							mClock;
 		sf::TcpListener						mListenerSocket;
 		bool								mListeningState;
@@ -84,10 +86,10 @@ class GameServer
 		float								mBattleFieldScrollSpeed;
 
 		std::size_t							mAircraftCount;
-		std::map<sf::Int32, AircraftInfo>	mAircraftInfo;
+		std::map<int, AircraftInfo>	mAircraftInfo;
 
 		std::vector<PeerPtr>				mPeers;
-		sf::Int32							mAircraftIdentifierCounter;
+		int							mAircraftIdentifierCounter;
 		bool								mWaitingThreadEnd;
 		
 		sf::Time							mLastSpawnTime;

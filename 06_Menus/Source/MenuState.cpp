@@ -12,10 +12,11 @@ MenuState::MenuState(StateStack& stack, Context context)
 , mGUIContainer()
 {
 	sf::Texture& texture = context.textures->get(Textures::TitleScreen);
-	mBackgroundSprite.setTexture(texture);
+	// mBackgroundSprite.setTexture(texture);
+	mBackgroundSprite.emplace(texture);
 
-	auto playButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
-	playButton->setPosition(100, 250);
+	auto playButton = std::make_shared<GUI::Button>(*context.textures);
+	playButton->setPosition({100, 250});
 	playButton->setText("Play");
 	playButton->setCallback([this] ()
 	{
@@ -23,16 +24,16 @@ MenuState::MenuState(StateStack& stack, Context context)
 		requestStackPush(States::Game);
 	});
 
-	auto settingsButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
-	settingsButton->setPosition(100, 300);
+	auto settingsButton = std::make_shared<GUI::Button>(*context.textures);
+	settingsButton->setPosition({100, 300});
 	settingsButton->setText("Settings");
 	settingsButton->setCallback([this] ()
 	{
 		requestStackPush(States::Settings);
 	});
 
-	auto exitButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
-	exitButton->setPosition(100, 350);
+	auto exitButton = std::make_shared<GUI::Button>(*context.textures);
+	exitButton->setPosition({100, 350});
 	exitButton->setText("Exit");
 	exitButton->setCallback([this] ()
 	{
@@ -50,7 +51,10 @@ void MenuState::draw()
 
 	window.setView(window.getDefaultView());
 
-	window.draw(mBackgroundSprite);
+	// 确保 Sprite 已初始化
+	if (mBackgroundSprite) {
+		window.draw(*mBackgroundSprite);
+	}
 	window.draw(mGUIContainer);
 }
 

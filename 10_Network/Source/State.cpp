@@ -2,11 +2,10 @@
 #include <Book/StateStack.hpp>
 
 
-State::Context::Context(sf::RenderWindow& window, TextureHolder& textures, FontHolder& fonts,
+State::Context::Context(sf::RenderWindow& window, TextureHolder& textures,
 	MusicPlayer& music, SoundPlayer& sounds, KeyBinding& keys1, KeyBinding& keys2)
 : window(&window)
 , textures(&textures)
-, fonts(&fonts)
 , music(&music)
 , sounds(&sounds)
 , keys1(&keys1)

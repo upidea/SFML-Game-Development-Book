@@ -9,19 +9,20 @@
 namespace GUI
 {
 
-Button::Button(const FontHolder& fonts, const TextureHolder& textures)
+Button::Button(const TextureHolder& textures)
 : mCallback()
 , mNormalTexture(textures.get(Textures::ButtonNormal))
 , mSelectedTexture(textures.get(Textures::ButtonSelected))
 , mPressedTexture(textures.get(Textures::ButtonPressed))
-, mSprite()
-, mText("", fonts.get(Fonts::Main), 16)
+, mSprite(mNormalTexture)
+, mFont("Media/Sansation.ttf")
+, mText(mFont, "", 16)
 , mIsToggle(false)
 {
-	mSprite.setTexture(mNormalTexture);
+	// mSprite.setTexture(mNormalTexture);
 
 	sf::FloatRect bounds = mSprite.getLocalBounds();
-	mText.setPosition(bounds.width / 2.f, bounds.height / 2.f);
+	mText.setPosition({bounds.size.x / 2.f, bounds.size.y / 2.f});
 }
 
 void Button::setCallback(Callback callback)

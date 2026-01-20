@@ -12,8 +12,8 @@ World::World(sf::RenderWindow& window)
 , mTextures() 
 , mSceneGraph()
 , mSceneLayers()
-, mWorldBounds(0.f, 0.f, mWorldView.getSize().x, 2000.f)
-, mSpawnPosition(mWorldView.getSize().x / 2.f, mWorldBounds.height - mWorldView.getSize().y / 2.f)
+, mWorldBounds({0.f, 0.f}, {mWorldView.getSize().x, 2000.f})
+, mSpawnPosition(mWorldView.getSize().x / 2.f, mWorldBounds.size.y - mWorldView.getSize().y / 2.f)
 , mScrollSpeed(-50.f)
 , mPlayerAircraft(nullptr)
 {
@@ -27,7 +27,7 @@ World::World(sf::RenderWindow& window)
 void World::update(sf::Time dt)
 {
 	// Scroll the world, reset player velocity
-	mWorldView.move(0.f, mScrollSpeed * dt.asSeconds());	
+	mWorldView.move({0.f, mScrollSpeed * dt.asSeconds()});	
 	mPlayerAircraft->setVelocity(0.f, 0.f);
 
 	// Forward commands to scene graph, adapt velocity (scrolling, diagonal correction)
@@ -76,7 +76,7 @@ void World::buildScene()
 
 	// Add the background sprite to the scene
 	std::unique_ptr<SpriteNode> backgroundSprite(new SpriteNode(texture, textureRect));
-	backgroundSprite->setPosition(mWorldBounds.left, mWorldBounds.top);
+	backgroundSprite->setPosition({mWorldBounds.position.x, mWorldBounds.position.y});
 	mSceneLayers[Background]->attachChild(std::move(backgroundSprite));
 
 	// Add player's aircraft
@@ -93,10 +93,10 @@ void World::adaptPlayerPosition()
 	const float borderDistance = 40.f;
 
 	sf::Vector2f position = mPlayerAircraft->getPosition();
-	position.x = std::max(position.x, viewBounds.left + borderDistance);
-	position.x = std::min(position.x, viewBounds.left + viewBounds.width - borderDistance);
-	position.y = std::max(position.y, viewBounds.top + borderDistance);
-	position.y = std::min(position.y, viewBounds.top + viewBounds.height - borderDistance);
+	position.x = std::max(position.x, viewBounds.position.x + borderDistance);
+	position.x = std::min(position.x, viewBounds.position.x + viewBounds.size.x - borderDistance);
+	position.y = std::max(position.y, viewBounds.position.y + borderDistance);
+	position.y = std::min(position.y, viewBounds.position.y + viewBounds.size.y - borderDistance);
 	mPlayerAircraft->setPosition(position);
 }
 

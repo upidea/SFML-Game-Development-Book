@@ -8,12 +8,14 @@
 #include <Book/ResourceHolder.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
 
 #include <vector>
 #include <string>
 #include <memory>
 #include <functional>
+#include <SFML/Graphics/RenderStates.hpp>
 
 
 class SoundPlayer;
@@ -61,6 +63,7 @@ class Button : public Component
     private:
         Callback				mCallback;
         sf::Sprite				mSprite;
+        sf::Font                mFont;
         sf::Text				mText;
         bool					mIsToggle;
 		SoundPlayer&			mSounds;

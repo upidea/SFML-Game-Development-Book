@@ -8,8 +8,9 @@
 namespace GUI
 {
 
-Label::Label(const std::string& text, const FontHolder& fonts)
-: mText(text, fonts.get(Fonts::Main), 16)
+Label::Label(const std::string& text)
+: mFont("Media/Sansation.ttf")
+, mText(mFont, text, 16)
 {
 }
 

@@ -7,12 +7,14 @@
 #include <Book/ResourceHolder.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
 
 #include <vector>
 #include <string>
 #include <memory>
 #include <functional>
+#include <SFML/Graphics/RenderStates.hpp>
 
 
 namespace GUI
@@ -34,7 +36,7 @@ class Button : public Component
 
 
 	public:
-								Button(const FontHolder& fonts, const TextureHolder& textures);
+								Button(const TextureHolder& textures);
 
         void					setCallback(Callback callback);
         void					setText(const std::string& text);
@@ -58,6 +60,7 @@ class Button : public Component
     private:
         Callback				mCallback;
         sf::Sprite				mSprite;
+        sf::Font                mFont;
         sf::Text				mText;
         bool					mIsToggle;
 };

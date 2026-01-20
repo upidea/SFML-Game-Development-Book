@@ -1,0 +1,75 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja Multi-Config",
+      "toolchainFile": "D:/c/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "DOXYGEN_EXECUTABLE": "D:/c/cmake/bin/doxygen.exe",
+        "CMAKE_MAKE_PROGRAM": "D:/00Program/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe",
+        "CMAKE_C_COMPILER": "D:/00Program/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe",
+        "CMAKE_CXX_COMPILER": "D:/00Program/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe",
+        "CMAKE_RC_COMPILER": "D:/Windows Kits/10/bin/10.0.26100.0/x86/rc.exe",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_CXX_STANDARD": "20",
+        "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+        "CMAKE_CONFIGURATION_TYPES": "Debug;Release",
+        "CMAKE_LIBRARY_PATH": "D:/Windows Kits/10/Lib/10.0.26100.0/um/x64;D:/Windows Kits/10/Lib/10.0.26100.0/ucrt/x64",
+        "CMAKE_INCLUDE_PATH": "D:/Windows Kits/10/Include/10.0.26100.0/um;D:/Windows Kits/10/Include/10.0.26100.0/ucrt;D:/Windows Kits/10/Include/10.0.26100.0/shared"
+      },
+      "environment": {
+        "VCPKG_ROOT": "D:/c/vcpkg",
+        "PATH": "D:/00Program/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64;C:/Windows/System32/WindowsPowerShell/v1.0;C:/Program Files/PowerShell/7;D:/Windows Kits/10/bin/10.0.26100.0/x86;D:/Windows Kits/10/bin/10.0.26100.0/x64;D:/00Program/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin",
+        "WindowsSDKVersion": "10.0.26100.0/",
+        "LIB": "D:/Windows Kits/10/Lib/10.0.26100.0/um/x64;D:/Windows Kits/10/Lib/10.0.26100.0/ucrt/x64;D:/00Program/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/lib/x64;$ENV{LIB}",
+        "INCLUDE": "D:/Windows Kits/10/Include/10.0.26100.0/um;D:/Windows Kits/10/Include/10.0.26100.0/ucrt;D:/Windows Kits/10/Include/10.0.26100.0/shared;D:/00Program/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/include;$ENV{INCLUDE}",
+        "VCPKG_MSBUILD_PATH": "D:/00Program/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin",
+        "VCPKG_BUILD_TYPE": "$if{streq(${presetName}, Debug)}debug$elseif{streq(${presetName}, Release)}release$else{}"
+      }
+    },
+    {
+      "name": "Debug",
+      "displayName": "Debug",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "Release",
+      "displayName": "Release",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "Debug",
+      "configurePreset": "Debug",
+      "configuration": "Debug",
+      "jobs": 1
+    },
+    {
+      "name": "Release",
+      "configurePreset": "Release",
+      "configuration": "Release",
+      "jobs": 8
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "Debug",
+      "configurePreset": "Debug"
+    }
+  ]  
+}

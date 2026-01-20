@@ -4,7 +4,7 @@
 #include <Book/SceneNode.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
-
+#include <SFML/Graphics/RenderStates.hpp>
 
 class SpriteNode : public SceneNode
 {

@@ -29,7 +29,7 @@ class MultiplayerGameState : public State
 
 	private:
 		void						updateBroadcastMessage(sf::Time elapsedTime);
-		void						handlePacket(sf::Int32 packetType, sf::Packet& packet);
+		void						handlePacket(int packetType, sf::Packet& packet);
 
 
 	private:
@@ -42,13 +42,14 @@ class MultiplayerGameState : public State
 		TextureHolder&				mTextureHolder;
 
 		std::map<int, PlayerPtr>	mPlayers;
-		std::vector<sf::Int32>		mLocalPlayerIdentifiers;
+		std::vector<int>		mLocalPlayerIdentifiers;
 		sf::TcpSocket				mSocket;
 		bool						mConnected;
 		std::unique_ptr<GameServer> mGameServer;
 		sf::Clock					mTickClock;
 
 		std::vector<std::string>	mBroadcasts;
+		sf::Font					mFont;
 		sf::Text					mBroadcastText;
 		sf::Time					mBroadcastElapsedTime;
 

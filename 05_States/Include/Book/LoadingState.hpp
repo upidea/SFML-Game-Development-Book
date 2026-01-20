@@ -6,7 +6,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Text.hpp>
 
-#include <Book/ParallelTask.hpp>
+// #include <Book/ParallelTask.hpp>
 
 
 class LoadingState : public State
@@ -25,7 +25,7 @@ private:
 	sf::RectangleShape		mProgressBarBackground;
 	sf::RectangleShape		mProgressBar;
 
-	ParallelTask			mLoadingTask;
+	// ParallelTask			mLoadingTask;
 };
 
 #endif // BOOK_LOADINGSTATE_HPP

@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.11)
 
 # Specify default build type if none provided (before project() command)
 if(NOT CMAKE_BUILD_TYPE)
@@ -15,44 +15,7 @@ endif()
 # Project name
 project(sfml-book)
 
-# Configuration options
-set(SFML_STATIC_LIBRARIES FALSE CACHE BOOL "Use static SFML librares")
-
-# General compiler options
-if (SFML_STATIC_LIBRARIES)
-	add_definitions(-DSFML_STATIC)
-endif()
-
-# Specific compiler options - set C++11 flag for g++ and clang
-if(CMAKE_COMPILER_IS_GNUCXX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-	
-	# Mac OS X: clang uses libc++ standard library
-	if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-	endif()
-endif()
-
-#####################################################################################################################################
-
-
-# Add directory containing FindSFML.cmake to module path
-set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake/;${CMAKE_MODULE_PATH}")
-
-# Find SFML
-# Note: SFML_STATIC_LIBRARIES determines which libraries are found by find_package()
-find_package(SFML 2 COMPONENTS audio graphics window system network)
-
-# If found, include and link; otherwise output error message
-if(SFML_FOUND)
-	include_directories(${SFML_INCLUDE_DIR})
-else()
-	set(SFML_ROOT "" CACHE PATH "SFML top-level directory")
-	message("\n-> SFML directory not found. Set SFML_ROOT to SFML's top-level path (containing \"include\" and \"lib\" directories).")
-	message("-> Make sure the SFML libraries with the same configuration (Release/Debug, Static/Dynamic) exist.\n")
-endif()
+find_package(SFML COMPONENTS Network Graphics Window Audio System CONFIG REQUIRED)
 
 ######################################################################################################################################
 
@@ -94,28 +57,63 @@ macro(build_chapter CHAPTER_NAME)
 	# Status output
 	message(STATUS "-> Chapter ${CHAPTER_NAME}")
 
-
 	#############################################################################
 	# Build executable
 	project(${CHAPTER_NAME})
-
-	set(CHAPTER_DIR "${PROJECT_SOURCE_DIR}/..")
-	include_directories("${CHAPTER_DIR}//Include")
 
 	# Executable: Add only Main.cpp, set name without _EXE postfix
 	add_executable(${PROJECT_NAME} Main.cpp ${CHAPTER_SOURCES})
 	set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${CHAPTER_NAME})
 
-	# Build static or shared libraries? Set chapter-specific DLL import macro
-	if(SFML_STATIC_LIBRARIES)
-		set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS "SFML_STATIC")
-	endif()
+	set(CHAPTER_DIR "${PROJECT_SOURCE_DIR}/..")
+	target_include_directories(${PROJECT_NAME} PRIVATE
+		"${CHAPTER_DIR}/Include"
+		${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include
+	)
 
-	# Link SFML. For versions < 2.2, SFML_DEPENDENCIES is not defined, and we do not need to link dependencies
-	if(SFML_VERSION_MINOR LESS 2)
-        set(SFML_DEPENDENCIES "")
+	target_link_libraries(${PROJECT_NAME} PRIVATE
+		SFML::Network SFML::Graphics SFML::Window SFML::Audio SFML::System
+	)
+
+	# 1. 获取目标的输出目录（自动适配Debug/Release/RelWithDebInfo等配置）
+	get_target_property(TARGET_OUTPUT_DIR ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
+	# 如果未显式设置输出目录，使用默认的二进制目录
+	if(NOT TARGET_OUTPUT_DIR)
+		# 计算源码目录相对于项目根目录的路径（比如 01_Intro/Source）
+		file(RELATIVE_PATH SRC_REL_PATH 
+			"${CMAKE_SOURCE_DIR}"  # 项目根源码目录
+			"${PROJECT_SOURCE_DIR}"  # 当前章节源码目录：01_Intro/Source
+		)
+		# 拼接成 exe 实际输出目录：build/01_Intro/Source/Debug
+		set(TARGET_OUTPUT_DIR "${CMAKE_BINARY_DIR}/${SRC_REL_PATH}/${CMAKE_BUILD_TYPE}")
 	endif()
-	target_link_libraries(${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
+	# 最终验证：打印最终的目标输出目录
+	message(STATUS "👉 最终 Exe 输出目录：${TARGET_OUTPUT_DIR}")
+
+	# 2. 定义Media源目录和目标目录
+	set(MEDIA_SOURCE_DIR "${CHAPTER_DIR}/Media")
+	set(MEDIA_DEST_DIR "${TARGET_OUTPUT_DIR}/Media")
+
+	# 3. 创建自定义命令：拷贝Media目录（排除CMakeLists.txt）
+	add_custom_command(
+		OUTPUT ${MEDIA_DEST_DIR}  # 输出标记，避免重复拷贝
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${MEDIA_DEST_DIR}  # 确保目标目录存在
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+			${MEDIA_SOURCE_DIR}
+			${MEDIA_DEST_DIR}
+		COMMAND ${CMAKE_COMMAND} -E remove -f ${MEDIA_DEST_DIR}/CMakeLists.txt  # 排除CMakeLists.txt
+		DEPENDS ${MEDIA_SOURCE_DIR}  # 源目录变化时重新拷贝
+		COMMENT "Copying Media directory to ${MEDIA_DEST_DIR}"
+	)
+
+	# 4. 创建自定义目标，并关联到可执行文件目标
+	add_custom_target(
+		CopyMedia_${CHAPTER_NAME}  # 唯一目标名，避免多章节冲突
+		DEPENDS ${MEDIA_DEST_DIR}  # 依赖拷贝命令的输出
+	)
+
+	# 5. 强制编译可执行文件时先执行Media拷贝
+	add_dependencies(${PROJECT_NAME} CopyMedia_${CHAPTER_NAME})	
 
 	install(TARGETS ${PROJECT_NAME}	RUNTIME DESTINATION ${CHAPTER_NAME})
 

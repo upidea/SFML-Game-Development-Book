@@ -18,7 +18,7 @@ class Label : public Component
             
 
 	public:
-							Label(const std::string& text, const FontHolder& fonts);
+							Label(const std::string& text);
 
         virtual bool		isSelectable() const;
 		void				setText(const std::string& text);
@@ -32,6 +32,7 @@ class Label : public Component
 
     private:
         sf::Text			mText;
+        sf::Font            mFont;
 };
 
 }

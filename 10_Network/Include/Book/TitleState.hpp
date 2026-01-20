@@ -4,6 +4,7 @@
 #include <Book/State.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
 
 
@@ -19,6 +20,7 @@ class TitleState : public State
 
 	private:
 		sf::Sprite			mBackgroundSprite;
+		sf::Font			mFont;
 		sf::Text			mText;
 
 		bool				mShowText;

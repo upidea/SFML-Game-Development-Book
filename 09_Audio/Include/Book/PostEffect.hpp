@@ -1,9 +1,6 @@
 #ifndef BOOK_POSTEFFECT_HPP
 #define BOOK_POSTEFFECT_HPP
 
-#include <SFML/System/NonCopyable.hpp>
-
-
 namespace sf
 {
 	class RenderTarget;
@@ -11,7 +8,7 @@ namespace sf
 	class Shader;
 }
 
-class PostEffect : sf::NonCopyable
+class PostEffect
 {
 	public:
 		virtual					~PostEffect();

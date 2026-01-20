@@ -8,6 +8,7 @@
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
 
 
@@ -32,11 +33,11 @@ class Application
 
 		sf::RenderWindow		mWindow;
 		TextureHolder			mTextures;
-	  	FontHolder				mFonts;
 		Player					mPlayer;
 
 		StateStack				mStateStack;
 
+		sf::Font				mFont;
 		sf::Text				mStatisticsText;
 		sf::Time				mStatisticsUpdateTime;
 		std::size_t				mStatisticsNumFrames;

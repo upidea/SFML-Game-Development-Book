@@ -81,8 +81,8 @@ void SceneNode::drawBoundingRect(sf::RenderTarget& target, sf::RenderStates) con
 	sf::FloatRect rect = getBoundingRect();
 
 	sf::RectangleShape shape;
-	shape.setPosition(sf::Vector2f(rect.left, rect.top));
-	shape.setSize(sf::Vector2f(rect.width, rect.height));
+	shape.setPosition(sf::Vector2f(rect.position.x, rect.position.y));
+	shape.setSize(sf::Vector2f(rect.size.x, rect.size.y));
 	shape.setFillColor(sf::Color::Transparent);
 	shape.setOutlineColor(sf::Color::Green);
 	shape.setOutlineThickness(1.f);
@@ -167,7 +167,7 @@ bool SceneNode::isDestroyed() const
 
 bool collision(const SceneNode& lhs, const SceneNode& rhs)
 {
-	return lhs.getBoundingRect().intersects(rhs.getBoundingRect());
+	return lhs.getBoundingRect().findIntersection(rhs.getBoundingRect()).has_value();
 }
 
 float distance(const SceneNode& lhs, const SceneNode& rhs)

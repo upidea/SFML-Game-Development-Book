@@ -14,17 +14,16 @@
 #include <limits>
 
 
-World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sounds, bool networked)
+World::World(sf::RenderTarget& outputTarget, SoundPlayer& sounds, bool networked)
 : mTarget(outputTarget)
 , mSceneTexture()
 , mWorldView(outputTarget.getDefaultView())
 , mTextures() 
-, mFonts(fonts)
 , mSounds(sounds)
 , mSceneGraph()
 , mSceneLayers()
-, mWorldBounds(0.f, 0.f, mWorldView.getSize().x, 5000.f)
-, mSpawnPosition(mWorldView.getSize().x / 2.f, mWorldBounds.height - mWorldView.getSize().y / 2.f)
+, mWorldBounds({0.f, 0.f}, {mWorldView.getSize().x, 5000.f})
+, mSpawnPosition(mWorldView.getSize().x / 2.f, mWorldBounds.size.y - mWorldView.getSize().y / 2.f)
 , mScrollSpeed(-50.f)
 , mScrollSpeedCompensation(1.f)
 , mPlayerAircrafts()
@@ -34,7 +33,7 @@ World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sou
 , mNetworkNode(nullptr)
 , mFinishSprite(nullptr)
 {
-	mSceneTexture.create(mTarget.getSize().x, mTarget.getSize().y);
+	mSceneTexture.resize({mTarget.getSize().x, mTarget.getSize().y});
 
 	loadTextures();
 	buildScene();
@@ -51,7 +50,7 @@ void World::setWorldScrollCompensation(float compensation)
 void World::update(sf::Time dt)
 {
 	// Scroll the world, reset player velocity
-	mWorldView.move(0.f, mScrollSpeed * dt.asSeconds() * mScrollSpeedCompensation);	
+	mWorldView.move({0.f, mScrollSpeed * dt.asSeconds() * mScrollSpeedCompensation});	
 
 	FOREACH(Aircraft* a, mPlayerAircrafts)
 		a->setVelocity(0.f, 0.f);
@@ -129,7 +128,7 @@ void World::removeAircraft(int identifier)
 
 Aircraft* World::addAircraft(int identifier)
 {
-	std::unique_ptr<Aircraft> player(new Aircraft(Aircraft::Eagle, mTextures, mFonts));
+	std::unique_ptr<Aircraft> player(new Aircraft(Aircraft::Eagle, mTextures));
 	player->setPosition(mWorldView.getCenter());
 	player->setIdentifier(identifier);
 
@@ -153,13 +152,13 @@ bool World::pollGameAction(GameActions::Action& out)
 
 void World::setCurrentBattleFieldPosition(float lineY)
 {
-	mWorldView.setCenter(mWorldView.getCenter().x, lineY - mWorldView.getSize().y/2);
-	mSpawnPosition.y = mWorldBounds.height; 
+	mWorldView.setCenter({mWorldView.getCenter().x, lineY - mWorldView.getSize().y/2});
+	mSpawnPosition.y = mWorldBounds.size.y; 
 }
 
 void World::setWorldHeight(float height)
 {
-	mWorldBounds.height = height;
+	mWorldBounds.size.y = height;
 }
 
 bool World::hasAlivePlayer() const
@@ -193,10 +192,10 @@ void World::adaptPlayerPosition()
 	FOREACH(Aircraft* aircraft, mPlayerAircrafts)
 	{
 		sf::Vector2f position = aircraft->getPosition();
-		position.x = std::max(position.x, viewBounds.left + borderDistance);
-		position.x = std::min(position.x, viewBounds.left + viewBounds.width - borderDistance);
-		position.y = std::max(position.y, viewBounds.top + borderDistance);
-		position.y = std::min(position.y, viewBounds.top + viewBounds.height - borderDistance);
+		position.x = std::max(position.x, viewBounds.position.x + borderDistance);
+		position.x = std::min(position.x, viewBounds.position.x + viewBounds.size.x - borderDistance);
+		position.y = std::max(position.y, viewBounds.position.y + borderDistance);
+		position.y = std::min(position.y, viewBounds.position.y + viewBounds.size.y - borderDistance);
 		aircraft->setPosition(position);
 	}
 }
@@ -323,17 +322,17 @@ void World::buildScene()
 
 	float viewHeight = mWorldView.getSize().y;
 	sf::IntRect textureRect(mWorldBounds);
-	textureRect.height += static_cast<int>(viewHeight);
+	textureRect.size.y += static_cast<int>(viewHeight);
 
 	// Add the background sprite to the scene
 	std::unique_ptr<SpriteNode> jungleSprite(new SpriteNode(jungleTexture, textureRect));
-	jungleSprite->setPosition(mWorldBounds.left, mWorldBounds.top - viewHeight);
+	jungleSprite->setPosition({mWorldBounds.position.x, mWorldBounds.position.y - viewHeight});
 	mSceneLayers[Background]->attachChild(std::move(jungleSprite));
 
 	// Add the finish line to the scene
 	sf::Texture& finishTexture = mTextures.get(Textures::FinishLine);
 	std::unique_ptr<SpriteNode> finishSprite(new SpriteNode(finishTexture));
-	finishSprite->setPosition(0.f, -76.f);
+	finishSprite->setPosition({0.f, -76.f});
 	mFinishSprite = finishSprite.get();
 	mSceneLayers[Background]->attachChild(std::move(finishSprite));
 
@@ -415,13 +414,13 @@ void World::spawnEnemies()
 {
 	// Spawn all enemies entering the view area (including distance) this frame
 	while (!mEnemySpawnPoints.empty()
-		&& mEnemySpawnPoints.back().y > getBattlefieldBounds().top)
+		&& mEnemySpawnPoints.back().y > getBattlefieldBounds().position.y)
 	{
 		SpawnPoint spawn = mEnemySpawnPoints.back();
 		
-		std::unique_ptr<Aircraft> enemy(new Aircraft(spawn.type, mTextures, mFonts));
-		enemy->setPosition(spawn.x, spawn.y);
-		enemy->setRotation(180.f);
+		std::unique_ptr<Aircraft> enemy(new Aircraft(spawn.type, mTextures));
+		enemy->setPosition({spawn.x, spawn.y});
+		enemy->setRotation(sf::degrees(180.f));
 		if (mNetworkedWorld) enemy->disablePickups();
 
 		mSceneLayers[UpperAir]->attachChild(std::move(enemy));
@@ -437,7 +436,7 @@ void World::destroyEntitiesOutsideView()
 	command.category = Category::Projectile | Category::EnemyAircraft;
 	command.action = derivedAction<Entity>([this] (Entity& e, sf::Time)
 	{
-		if (!getBattlefieldBounds().intersects(e.getBoundingRect()))
+		if (!getBattlefieldBounds().findIntersection(e.getBoundingRect()).has_value())
 			e.remove();
 	});
 
@@ -498,8 +497,8 @@ sf::FloatRect World::getBattlefieldBounds() const
 {
 	// Return view bounds + some area at top, where enemies spawn
 	sf::FloatRect bounds = getViewBounds();
-	bounds.top -= 100.f;
-	bounds.height += 100.f;
+	bounds.position.y -= 100.f;
+	bounds.size.y += 100.f;
 
 	return bounds;
 }

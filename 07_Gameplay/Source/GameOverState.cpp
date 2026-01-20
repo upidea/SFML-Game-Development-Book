@@ -10,13 +10,14 @@
 
 GameOverState::GameOverState(StateStack& stack, Context context)
 : State(stack, context)
-, mGameOverText()
+, mFont("Media/Sansation.ttf")
+, mGameOverText(mFont)
 , mElapsedTime(sf::Time::Zero)
 {
-	sf::Font& font = context.fonts->get(Fonts::Main);
+	// sf::Font& font = context.fonts->get(Fonts::Main);
 	sf::Vector2f windowSize(context.window->getSize());
 
-	mGameOverText.setFont(font);
+	// mGameOverText.setFont(font);
 	if (context.player->getMissionStatus() == Player::MissionFailure)
 		mGameOverText.setString("Mission failed!");	
 	else
@@ -24,7 +25,7 @@ GameOverState::GameOverState(StateStack& stack, Context context)
 
 	mGameOverText.setCharacterSize(70);
 	centerOrigin(mGameOverText);
-	mGameOverText.setPosition(0.5f * windowSize.x, 0.4f * windowSize.y);
+	mGameOverText.setPosition({0.5f * windowSize.x, 0.4f * windowSize.y});
 }
 
 void GameOverState::draw()

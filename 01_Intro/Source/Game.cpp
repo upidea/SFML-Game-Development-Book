@@ -1,16 +1,15 @@
 #include <Book/Game.hpp>
 #include <Book/StringHelpers.hpp>
 
-
 const float Game::PlayerSpeed = 100.f;
 const sf::Time Game::TimePerFrame = sf::seconds(1.f/60.f);
 
 Game::Game()
-: mWindow(sf::VideoMode(640, 480), "SFML Application", sf::Style::Close)
-, mTexture()
-, mPlayer()
-, mFont()
-, mStatisticsText()
+: mWindow(sf::VideoMode({640, 480}), "SFML Application", sf::Style::Close)
+, mTexture("Media/Textures/Eagle.png")
+, mPlayer(mTexture)
+, mFont("Media/Sansation.ttf")
+, mStatisticsText(mFont)
 , mStatisticsUpdateTime()
 , mStatisticsNumFrames(0)
 , mIsMovingUp(false)
@@ -18,17 +17,13 @@ Game::Game()
 , mIsMovingRight(false)
 , mIsMovingLeft(false)
 {
-	if (!mTexture.loadFromFile("Media/Textures/Eagle.png"))
-	{
-		// Handle loading error
-	}
+	mWindow.setFramerateLimit(60);
 
-	mPlayer.setTexture(mTexture);
-	mPlayer.setPosition(100.f, 100.f);
+	// mPlayer.setTexture(mTexture);
+	mPlayer.setPosition({100.f, 100.f});
 	
-	mFont.loadFromFile("Media/Sansation.ttf");
-	mStatisticsText.setFont(mFont);
-	mStatisticsText.setPosition(5.f, 5.f);
+	// mStatisticsText.setFont(mFont);
+	mStatisticsText.setPosition({5.f, 5.f});
 	mStatisticsText.setCharacterSize(10);
 }
 
@@ -45,9 +40,10 @@ void Game::run()
 			timeSinceLastUpdate -= TimePerFrame;
 
 			processEvents();
+			// 按游戏刻更新的内容
 			update(TimePerFrame);
 		}
-
+		// 按deltaTime更新的内容
 		updateStatistics(elapsedTime);
 		render();
 	}
@@ -55,22 +51,15 @@ void Game::run()
 
 void Game::processEvents()
 {
-	sf::Event event;
-	while (mWindow.pollEvent(event))
-	{
-		switch (event.type)
-		{
-			case sf::Event::KeyPressed:
-				handlePlayerInput(event.key.code, true);
-				break;
-
-			case sf::Event::KeyReleased:
-				handlePlayerInput(event.key.code, false);
-				break;
-
-			case sf::Event::Closed:
-				mWindow.close();
-				break;
+	while (auto event = mWindow.pollEvent()) {
+		if (event->is<sf::Event::Closed>()) {
+			mWindow.close();
+		}
+		else if (event->is<sf::Event::KeyPressed>()) {
+			handlePlayerInput(event->getIf<sf::Event::KeyPressed>()->code, true);
+		}
+		else if (event->is<sf::Event::KeyReleased>()) {
+			handlePlayerInput(event->getIf<sf::Event::KeyReleased>()->code, false);
 		}
 	}
 }
@@ -116,12 +105,12 @@ void Game::updateStatistics(sf::Time elapsedTime)
 
 void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
 {	
-	if (key == sf::Keyboard::W)
+	if (key == sf::Keyboard::Key::W)
 		mIsMovingUp = isPressed;
-	else if (key == sf::Keyboard::S)
+	else if (key == sf::Keyboard::Key::S)
 		mIsMovingDown = isPressed;
-	else if (key == sf::Keyboard::A)
+	else if (key == sf::Keyboard::Key::A)
 		mIsMovingLeft = isPressed;
-	else if (key == sf::Keyboard::D)
+	else if (key == sf::Keyboard::Key::D)
 		mIsMovingRight = isPressed;
 }

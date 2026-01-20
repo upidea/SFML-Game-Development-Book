@@ -7,16 +7,16 @@
 const sf::Time Game::TimePerFrame = sf::seconds(1.f/60.f);
 
 Game::Game()
-: mWindow(sf::VideoMode(640, 480), "World", sf::Style::Close)
+: mWindow(sf::VideoMode({640, 480}), "World", sf::Style::Close)
 , mWorld(mWindow)
-, mFont()
-, mStatisticsText()
+, mFont("Media/Sansation.ttf")
+, mStatisticsText(mFont)
 , mStatisticsUpdateTime()
 , mStatisticsNumFrames(0)
 {
-	mFont.loadFromFile("Media/Sansation.ttf");
-	mStatisticsText.setFont(mFont);
-	mStatisticsText.setPosition(5.f, 5.f);
+	mWindow.setFramerateLimit(60);
+
+	mStatisticsText.setPosition({5.f, 5.f});
 	mStatisticsText.setCharacterSize(10);
 }
 
@@ -44,22 +44,15 @@ void Game::run()
 
 void Game::processEvents()
 {
-	sf::Event event;
-	while (mWindow.pollEvent(event))
-	{
-		switch (event.type)
-		{
-			case sf::Event::KeyPressed:
-				handlePlayerInput(event.key.code, true);
-				break;
-
-			case sf::Event::KeyReleased:
-				handlePlayerInput(event.key.code, false);
-				break;
-
-			case sf::Event::Closed:
-				mWindow.close();
-				break;
+	while (auto event = mWindow.pollEvent()) {
+		if (event->is<sf::Event::Closed>()) {
+			mWindow.close();
+		}
+		else if (event->is<sf::Event::KeyPressed>()) {
+			handlePlayerInput(event->getIf<sf::Event::KeyPressed>()->code, true);
+		}
+		else if (event->is<sf::Event::KeyReleased>()) {
+			handlePlayerInput(event->getIf<sf::Event::KeyReleased>()->code, false);
 		}
 	}
 }

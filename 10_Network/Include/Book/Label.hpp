@@ -5,7 +5,9 @@
 #include <Book/ResourceIdentifiers.hpp>
 #include <Book/ResourceHolder.hpp>
 
+#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
 
 
 namespace GUI
@@ -18,7 +20,7 @@ class Label : public Component
             
 
 	public:
-							Label(const std::string& text, const FontHolder& fonts);
+							Label(const std::string& text);
 
         virtual bool		isSelectable() const;
 		void				setText(const std::string& text);
@@ -31,6 +33,7 @@ class Label : public Component
 
 
     private:
+        sf::Font            mFont;
         sf::Text			mText;
 };
 

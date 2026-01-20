@@ -5,28 +5,31 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/View.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
 
 
 MenuState::MenuState(StateStack& stack, Context context)
 : State(stack, context)
+, mFont("Media/Sansation.ttf")
 , mOptions()
 , mOptionIndex(0)
 {
 	sf::Texture& texture = context.textures->get(Textures::TitleScreen);
-	sf::Font& font = context.fonts->get(Fonts::Main);
+	// sf::Font& font = context.fonts->get(Fonts::Main);
 
-	mBackgroundSprite.setTexture(texture);
+	// mBackgroundSprite.setTexture(texture);
+	mBackgroundSprite.emplace(texture);	// emplace 直接在 optional 中构造 Sprite
 	
 	// A simple menu demonstration
-	sf::Text playOption;
-	playOption.setFont(font);
+	sf::Text playOption(mFont);
+	// playOption.setFont(font);
 	playOption.setString("Play");
 	centerOrigin(playOption);
 	playOption.setPosition(context.window->getView().getSize() / 2.f);
 	mOptions.push_back(playOption);
 
-	sf::Text exitOption;
-	exitOption.setFont(font);
+	sf::Text exitOption(mFont);
+	// exitOption.setFont(font);
 	exitOption.setString("Exit");
 	centerOrigin(exitOption);
 	exitOption.setPosition(playOption.getPosition() + sf::Vector2f(0.f, 30.f));
@@ -40,7 +43,10 @@ void MenuState::draw()
 	sf::RenderWindow& window = *getContext().window;
 
 	window.setView(window.getDefaultView());
-	window.draw(mBackgroundSprite);
+	// 确保 Sprite 已初始化
+	if (mBackgroundSprite) {
+		window.draw(*mBackgroundSprite);
+	}
 
 	FOREACH(const sf::Text& text, mOptions)
 		window.draw(text);
@@ -54,10 +60,11 @@ bool MenuState::update(sf::Time)
 bool MenuState::handleEvent(const sf::Event& event)
 {
 	// The demonstration menu logic
-	if (event.type != sf::Event::KeyPressed)
-		return false;
+	// if (event.type != sf::Event::KeyPressed)
+	// 	return false;
 
-	if (event.key.code == sf::Keyboard::Return)
+	const auto* keyEvent = event.getIf<sf::Event::KeyPressed>();
+	if (keyEvent != nullptr &&	keyEvent->code == sf::Keyboard::Key::Enter)
 	{
 		if (mOptionIndex == Play)
 		{
@@ -71,7 +78,7 @@ bool MenuState::handleEvent(const sf::Event& event)
 		}
 	}
 
-	else if (event.key.code == sf::Keyboard::Up)
+	else if (keyEvent != nullptr &&	keyEvent->code == sf::Keyboard::Key::Up)
 	{
 		// Decrement and wrap-around
 		if (mOptionIndex > 0)
@@ -82,7 +89,7 @@ bool MenuState::handleEvent(const sf::Event& event)
 		updateOptionText();
 	}
 
-	else if (event.key.code == sf::Keyboard::Down)
+	else if (keyEvent != nullptr &&	keyEvent->code == sf::Keyboard::Key::Down)
 	{
 		// Increment and wrap-around
 		if (mOptionIndex < mOptions.size() - 1)
@@ -103,8 +110,8 @@ void MenuState::updateOptionText()
 
 	// White all texts
 	FOREACH(sf::Text& text, mOptions)
-		text.setColor(sf::Color::White);
+		text.setFillColor(sf::Color::White);
 
 	// Red the selected text
-	mOptions[mOptionIndex].setColor(sf::Color::Red);
+	mOptions[mOptionIndex].setFillColor(sf::Color::Red);
 }

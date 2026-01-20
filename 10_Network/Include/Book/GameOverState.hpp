@@ -5,6 +5,7 @@
 #include <Book/Container.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
 
 
@@ -19,6 +20,7 @@ class GameOverState : public State
 
 
 	private:
+		sf::Font			mFont;
 		sf::Text			mGameOverText;
 		sf::Time			mElapsedTime;
 };

@@ -21,7 +21,7 @@ GameServer::GameServer(sf::Vector2f battlefieldSize)
 , mMaxConnectedPlayers(10)
 , mConnectedPlayers(0)
 , mWorldHeight(5000.f)
-, mBattleFieldRect(0.f, mWorldHeight - battlefieldSize.y, battlefieldSize.x, battlefieldSize.y)
+, mBattleFieldRect({0.f, mWorldHeight - battlefieldSize.y}, {battlefieldSize.x, battlefieldSize.y})
 , mBattleFieldScrollSpeed(-50.f)
 , mAircraftCount(0)
 , mPeers(1)
@@ -32,23 +32,26 @@ GameServer::GameServer(sf::Vector2f battlefieldSize)
 {
 	mListenerSocket.setBlocking(false);
 	mPeers[0].reset(new RemotePeer());
-	mThread.launch();
+	// mThread.launch();
 }
 
 GameServer::~GameServer()
 {
 	mWaitingThreadEnd = true;
-	mThread.wait();
+	// mThread.wait();
+	if (mThread.joinable()) {
+    	mThread.join();
+	}
 }
 
-void GameServer::notifyPlayerRealtimeChange(sf::Int32 aircraftIdentifier, sf::Int32 action, bool actionEnabled)
+void GameServer::notifyPlayerRealtimeChange(int aircraftIdentifier, int action, bool actionEnabled)
 {
 	for (std::size_t i = 0; i < mConnectedPlayers; ++i)
 	{
 		if (mPeers[i]->ready)
 		{
 			sf::Packet packet;
-			packet << static_cast<sf::Int32>(Server::PlayerRealtimeChange);
+			packet << static_cast<int>(Server::PlayerRealtimeChange);
 			packet << aircraftIdentifier;
 			packet << action;
 			packet << actionEnabled;
@@ -58,14 +61,14 @@ void GameServer::notifyPlayerRealtimeChange(sf::Int32 aircraftIdentifier, sf::In
 	}
 }
 
-void GameServer::notifyPlayerEvent(sf::Int32 aircraftIdentifier, sf::Int32 action)
+void GameServer::notifyPlayerEvent(int aircraftIdentifier, int action)
 {
 	for (std::size_t i = 0; i < mConnectedPlayers; ++i)
 	{
 		if (mPeers[i]->ready)
 		{
 			sf::Packet packet;
-			packet << static_cast<sf::Int32>(Server::PlayerEvent);
+			packet << static_cast<int>(Server::PlayerEvent);
 			packet << aircraftIdentifier;
 			packet << action;
 
@@ -74,14 +77,14 @@ void GameServer::notifyPlayerEvent(sf::Int32 aircraftIdentifier, sf::Int32 actio
 	}
 }
 
-void GameServer::notifyPlayerSpawn(sf::Int32 aircraftIdentifier)
+void GameServer::notifyPlayerSpawn(int aircraftIdentifier)
 {
 	for (std::size_t i = 0; i < mConnectedPlayers; ++i)
 	{
 		if (mPeers[i]->ready)
 		{
 			sf::Packet packet;
-			packet << static_cast<sf::Int32>(Server::PlayerConnect);
+			packet << static_cast<int>(Server::PlayerConnect);
 			packet << aircraftIdentifier << mAircraftInfo[aircraftIdentifier].position.x << mAircraftInfo[aircraftIdentifier].position.y;
 			mPeers[i]->socket.send(packet);
 		}
@@ -94,7 +97,7 @@ void GameServer::setListening(bool enable)
 	if (enable)
 	{	
 		if (!mListeningState)
-			mListeningState = (mListenerSocket.listen(ServerPort) == sf::TcpListener::Done);
+			mListeningState = (mListenerSocket.listen(ServerPort) == sf::TcpListener::Status::Done);
 	}
 	else
 	{
@@ -127,7 +130,7 @@ void GameServer::executionThread()
 		// Fixed update step
 		while (stepTime >= stepInterval)
 		{
-			mBattleFieldRect.top += mBattleFieldScrollSpeed * stepInterval.asSeconds();
+			mBattleFieldRect.position.y += mBattleFieldScrollSpeed * stepInterval.asSeconds();
 			stepTime -= stepInterval;
 		}
 
@@ -158,7 +161,7 @@ void GameServer::tick()
 	if (allAircraftsDone)
 	{
 		sf::Packet missionSuccessPacket;
-		missionSuccessPacket << static_cast<sf::Int32>(Server::MissionSuccess);
+		missionSuccessPacket << static_cast<int>(Server::MissionSuccess);
 		sendToAll(missionSuccessPacket);
 	}
 
@@ -175,7 +178,7 @@ void GameServer::tick()
 	if (now() >= mTimeForNextSpawn + mLastSpawnTime)
 	{	
 		// No more enemies are spawned near the end
-		if (mBattleFieldRect.top > 600.f)
+		if (mBattleFieldRect.position.y > 600.f)
 		{
 			std::size_t enemyCount = 1u + randomInt(2);
 			float spawnCenter = static_cast<float>(randomInt(500) - 250);
@@ -195,9 +198,9 @@ void GameServer::tick()
 			for (std::size_t i = 0; i < enemyCount; ++i)
 			{
 				sf::Packet packet;
-				packet << static_cast<sf::Int32>(Server::SpawnEnemy);
-				packet << static_cast<sf::Int32>(1 + randomInt(Aircraft::TypeCount-1));
-				packet << mWorldHeight - mBattleFieldRect.top + 500;
+				packet << static_cast<int>(Server::SpawnEnemy);
+				packet << static_cast<int>(1 + randomInt(Aircraft::TypeCount-1));
+				packet << mWorldHeight - mBattleFieldRect.position.y + 500;
 				packet << nextSpawnPosition;
 
 				nextSpawnPosition += planeDistance / 2.f;
@@ -225,7 +228,7 @@ void GameServer::handleIncomingPackets()
 		if (peer->ready)
 		{
 			sf::Packet packet;
-			while (peer->socket.receive(packet) == sf::Socket::Done)
+			while (peer->socket.receive(packet) == sf::Socket::Status::Done)
 			{
 				// Interpret packet and react to it
 				handleIncomingPacket(packet, *peer, detectedTimeout);
@@ -249,7 +252,7 @@ void GameServer::handleIncomingPackets()
 
 void GameServer::handleIncomingPacket(sf::Packet& packet, RemotePeer& receivingPeer, bool& detectedTimeout)
 {
-	sf::Int32 packetType;
+	int packetType;
 	packet >> packetType;
 
 	switch (packetType)
@@ -262,8 +265,8 @@ void GameServer::handleIncomingPacket(sf::Packet& packet, RemotePeer& receivingP
 
 		case Client::PlayerEvent:
 		{
-			sf::Int32 aircraftIdentifier;
-			sf::Int32 action;
+			int aircraftIdentifier;
+			int action;
 			packet >> aircraftIdentifier >> action;
 
 			notifyPlayerEvent(aircraftIdentifier, action);
@@ -271,8 +274,8 @@ void GameServer::handleIncomingPacket(sf::Packet& packet, RemotePeer& receivingP
 
 		case Client::PlayerRealtimeChange:
 		{
-			sf::Int32 aircraftIdentifier;
-			sf::Int32 action;
+			int aircraftIdentifier;
+			int action;
 			bool actionEnabled;
 			packet >> aircraftIdentifier >> action >> actionEnabled;
 			mAircraftInfo[aircraftIdentifier].realtimeActions[action] = actionEnabled;
@@ -282,12 +285,12 @@ void GameServer::handleIncomingPacket(sf::Packet& packet, RemotePeer& receivingP
 		case Client::RequestCoopPartner:
 		{
 			receivingPeer.aircraftIdentifiers.push_back(mAircraftIdentifierCounter);
-			mAircraftInfo[mAircraftIdentifierCounter].position = sf::Vector2f(mBattleFieldRect.width / 2, mBattleFieldRect.top + mBattleFieldRect.height / 2);
+			mAircraftInfo[mAircraftIdentifierCounter].position = sf::Vector2f(mBattleFieldRect.size.x / 2, mBattleFieldRect.position.y + mBattleFieldRect.size.y / 2);
 			mAircraftInfo[mAircraftIdentifierCounter].hitpoints = 100;
 			mAircraftInfo[mAircraftIdentifierCounter].missileAmmo = 2;
 
 			sf::Packet requestPacket;
-			requestPacket << static_cast<sf::Int32>(Server::AcceptCoopPartner);
+			requestPacket << static_cast<int>(Server::AcceptCoopPartner);
 			requestPacket << mAircraftIdentifierCounter;
 			requestPacket << mAircraftInfo[mAircraftIdentifierCounter].position.x;
 			requestPacket << mAircraftInfo[mAircraftIdentifierCounter].position.y;
@@ -301,7 +304,7 @@ void GameServer::handleIncomingPacket(sf::Packet& packet, RemotePeer& receivingP
 				if (peer.get() != &receivingPeer && peer->ready)
 				{
 					sf::Packet notifyPacket;
-					notifyPacket << static_cast<sf::Int32>(Server::PlayerConnect);
+					notifyPacket << static_cast<int>(Server::PlayerConnect);
 					notifyPacket << mAircraftIdentifierCounter;
 					notifyPacket << mAircraftInfo[mAircraftIdentifierCounter].position.x;
 					notifyPacket << mAircraftInfo[mAircraftIdentifierCounter].position.y;
@@ -313,14 +316,14 @@ void GameServer::handleIncomingPacket(sf::Packet& packet, RemotePeer& receivingP
 
 		case Client::PositionUpdate:
 		{
-			sf::Int32 numAircrafts;
+			int numAircrafts;
 			packet >> numAircrafts;
 
-			for (sf::Int32 i = 0; i < numAircrafts; ++i)
+			for (int i = 0; i < numAircrafts; ++i)
 			{
-				sf::Int32 aircraftIdentifier;
-				sf::Int32 aircraftHitpoints;
-				sf::Int32 missileAmmo;
+				int aircraftIdentifier;
+				int aircraftHitpoints;
+				int missileAmmo;
 				sf::Vector2f aircraftPosition;
 				packet >> aircraftIdentifier >> aircraftPosition.x >> aircraftPosition.y >> aircraftHitpoints >> missileAmmo;
 				mAircraftInfo[aircraftIdentifier].position = aircraftPosition;
@@ -331,7 +334,7 @@ void GameServer::handleIncomingPacket(sf::Packet& packet, RemotePeer& receivingP
 
 		case Client::GameEvent:
 		{
-			sf::Int32 action;
+			int action;
 			float x;
 			float y;
 
@@ -344,8 +347,8 @@ void GameServer::handleIncomingPacket(sf::Packet& packet, RemotePeer& receivingP
 			if (action == GameActions::EnemyExplode && randomInt(3) == 0 && &receivingPeer == mPeers[0].get())
 			{
 				sf::Packet packet;
-				packet << static_cast<sf::Int32>(Server::SpawnPickup);
-				packet << static_cast<sf::Int32>(randomInt(Pickup::TypeCount));
+				packet << static_cast<int>(Server::SpawnPickup);
+				packet << static_cast<int>(randomInt(Pickup::TypeCount));
 				packet << x;
 				packet << y;
 
@@ -358,9 +361,9 @@ void GameServer::handleIncomingPacket(sf::Packet& packet, RemotePeer& receivingP
 void GameServer::updateClientState()
 {
 	sf::Packet updateClientStatePacket;
-	updateClientStatePacket << static_cast<sf::Int32>(Server::UpdateClientState);
-	updateClientStatePacket << static_cast<float>(mBattleFieldRect.top + mBattleFieldRect.height);
-	updateClientStatePacket << static_cast<sf::Int32>(mAircraftInfo.size());
+	updateClientStatePacket << static_cast<int>(Server::UpdateClientState);
+	updateClientStatePacket << static_cast<float>(mBattleFieldRect.position.y + mBattleFieldRect.size.y);
+	updateClientStatePacket << static_cast<int>(mAircraftInfo.size());
 
 	FOREACH(auto aircraft, mAircraftInfo)
 		updateClientStatePacket << aircraft.first << aircraft.second.position.x << aircraft.second.position.y;
@@ -373,15 +376,15 @@ void GameServer::handleIncomingConnections()
 	if (!mListeningState)
 		return;
 
-	if (mListenerSocket.accept(mPeers[mConnectedPlayers]->socket) == sf::TcpListener::Done)
+	if (mListenerSocket.accept(mPeers[mConnectedPlayers]->socket) == sf::TcpListener::Status::Done)
 	{
 		// order the new client to spawn its own plane ( player 1 )
-		mAircraftInfo[mAircraftIdentifierCounter].position = sf::Vector2f(mBattleFieldRect.width / 2, mBattleFieldRect.top + mBattleFieldRect.height / 2);
+		mAircraftInfo[mAircraftIdentifierCounter].position = sf::Vector2f(mBattleFieldRect.size.x / 2, mBattleFieldRect.position.y + mBattleFieldRect.size.y / 2);
 		mAircraftInfo[mAircraftIdentifierCounter].hitpoints = 100;
 		mAircraftInfo[mAircraftIdentifierCounter].missileAmmo = 2;
 
 		sf::Packet packet;
-		packet << static_cast<sf::Int32>(Server::SpawnSelf);
+		packet << static_cast<int>(Server::SpawnSelf);
 		packet << mAircraftIdentifierCounter;
 		packet << mAircraftInfo[mAircraftIdentifierCounter].position.x;
 		packet << mAircraftInfo[mAircraftIdentifierCounter].position.y;
@@ -412,9 +415,9 @@ void GameServer::handleDisconnections()
 		if ((*itr)->timedOut)
 		{
 			// Inform everyone of the disconnection, erase 
-			FOREACH(sf::Int32 identifier, (*itr)->aircraftIdentifiers)
+			FOREACH(int identifier, (*itr)->aircraftIdentifiers)
 			{
-				sendToAll(sf::Packet() << static_cast<sf::Int32>(Server::PlayerDisconnect) << identifier);
+				sendToAll(sf::Packet() << static_cast<int>(Server::PlayerDisconnect) << identifier);
 
 				mAircraftInfo.erase(identifier);
 			}
@@ -444,15 +447,15 @@ void GameServer::handleDisconnections()
 void GameServer::informWorldState(sf::TcpSocket& socket)
 {
 	sf::Packet packet;
-	packet << static_cast<sf::Int32>(Server::InitialState);
-	packet << mWorldHeight << mBattleFieldRect.top + mBattleFieldRect.height;
-	packet << static_cast<sf::Int32>(mAircraftCount);
+	packet << static_cast<int>(Server::InitialState);
+	packet << mWorldHeight << mBattleFieldRect.position.y + mBattleFieldRect.size.y;
+	packet << static_cast<int>(mAircraftCount);
 
 	for (std::size_t i = 0; i < mConnectedPlayers; ++i)
 	{
 		if (mPeers[i]->ready)
 		{
-			FOREACH(sf::Int32 identifier, mPeers[i]->aircraftIdentifiers)
+			FOREACH(int identifier, mPeers[i]->aircraftIdentifiers)
 				packet << identifier << mAircraftInfo[identifier].position.x << mAircraftInfo[identifier].position.y << mAircraftInfo[identifier].hitpoints << mAircraftInfo[identifier].missileAmmo;
 		}
 	}
@@ -467,7 +470,7 @@ void GameServer::broadcastMessage(const std::string& message)
 		if (mPeers[i]->ready)
 		{
 			sf::Packet packet;
-			packet << static_cast<sf::Int32>(Server::BroadcastMessage);
+			packet << static_cast<int>(Server::BroadcastMessage);
 			packet << message;
 
 			mPeers[i]->socket.send(packet);

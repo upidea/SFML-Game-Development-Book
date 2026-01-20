@@ -17,7 +17,7 @@ namespace Textures
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(640, 480), "Resources");
+	sf::RenderWindow window(sf::VideoMode({640, 480}), "Resources");
 	window.setFramerateLimit(20);
 
 	// Try to load resources
@@ -36,15 +36,14 @@ int main()
 	// Access resources
 	sf::Sprite landscape(textures.get(Textures::Landscape));
 	sf::Sprite airplane(textures.get(Textures::Airplane));
-	airplane.setPosition(200.f, 200.f);
+	airplane.setPosition({200.f, 200.f});
 
 	while (window.isOpen())
 	{
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			if (event.type == sf::Event::KeyPressed || event.type == sf::Event::Closed)
-				return 0;
+		while (auto event = window.pollEvent()) {
+			if ( event->is<sf::Event::KeyPressed>() || event->is<sf::Event::Closed>()) {
+				window.close();
+			}
 		}
 
 		window.clear();

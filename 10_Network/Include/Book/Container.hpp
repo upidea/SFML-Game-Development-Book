@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <memory>
+#include <SFML/Graphics/RenderStates.hpp>
 
 
 namespace GUI

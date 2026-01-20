@@ -11,22 +11,22 @@ KeyBinding::KeyBinding(int controlPreconfiguration)
 	// Set initial key bindings for player 1
 	if (controlPreconfiguration == 1)
 	{
-		mKeyMap[sf::Keyboard::Left]	 = PlayerAction::MoveLeft;
-		mKeyMap[sf::Keyboard::Right] = PlayerAction::MoveRight;
-		mKeyMap[sf::Keyboard::Up]    = PlayerAction::MoveUp;
-		mKeyMap[sf::Keyboard::Down]  = PlayerAction::MoveDown;
-		mKeyMap[sf::Keyboard::Space] = PlayerAction::Fire;
-		mKeyMap[sf::Keyboard::M]     = PlayerAction::LaunchMissile;
+		mKeyMap[sf::Keyboard::Key::Left]	 = PlayerAction::MoveLeft;
+		mKeyMap[sf::Keyboard::Key::Right] = PlayerAction::MoveRight;
+		mKeyMap[sf::Keyboard::Key::Up]    = PlayerAction::MoveUp;
+		mKeyMap[sf::Keyboard::Key::Down]  = PlayerAction::MoveDown;
+		mKeyMap[sf::Keyboard::Key::Space] = PlayerAction::Fire;
+		mKeyMap[sf::Keyboard::Key::M]     = PlayerAction::LaunchMissile;
 	}
 	else if (controlPreconfiguration == 2)
 	{
 		// Player 2
-		mKeyMap[sf::Keyboard::A] = PlayerAction::MoveLeft;
-		mKeyMap[sf::Keyboard::D] = PlayerAction::MoveRight;
-		mKeyMap[sf::Keyboard::W] = PlayerAction::MoveUp;
-		mKeyMap[sf::Keyboard::S] = PlayerAction::MoveDown;
-		mKeyMap[sf::Keyboard::F] = PlayerAction::Fire;
-		mKeyMap[sf::Keyboard::R] = PlayerAction::LaunchMissile;
+		mKeyMap[sf::Keyboard::Key::A] = PlayerAction::MoveLeft;
+		mKeyMap[sf::Keyboard::Key::D] = PlayerAction::MoveRight;
+		mKeyMap[sf::Keyboard::Key::W] = PlayerAction::MoveUp;
+		mKeyMap[sf::Keyboard::Key::S] = PlayerAction::MoveDown;
+		mKeyMap[sf::Keyboard::Key::F] = PlayerAction::Fire;
+		mKeyMap[sf::Keyboard::Key::R] = PlayerAction::LaunchMissile;
 	}
 }
 
@@ -53,7 +53,7 @@ sf::Keyboard::Key KeyBinding::getAssignedKey(Action action) const
 			return pair.first;
 	}
 
-	return sf::Keyboard::Unknown;
+	return sf::Keyboard::Key::Unknown;
 }
 
 bool KeyBinding::checkAction(sf::Keyboard::Key key, Action& out) const

@@ -4,16 +4,16 @@
 #include <SFML/Graphics/Texture.hpp>
 
 
-Animation::Animation()
-: mSprite()
-, mFrameSize()
-, mNumFrames(0)
-, mCurrentFrame(0)
-, mDuration(sf::Time::Zero)
-, mElapsedTime(sf::Time::Zero)
-, mRepeat(false)
-{
-}
+// Animation::Animation()
+// : mSprite()
+// , mFrameSize()
+// , mNumFrames(0)
+// , mCurrentFrame(0)
+// , mDuration(sf::Time::Zero)
+// , mElapsedTime(sf::Time::Zero)
+// , mRepeat(false)
+// {
+// }
 
 Animation::Animation(const sf::Texture& texture)
 : mSprite(texture)
@@ -31,7 +31,7 @@ void Animation::setTexture(const sf::Texture& texture)
 	mSprite.setTexture(texture);
 }
 
-const sf::Texture* Animation::getTexture() const
+const sf::Texture Animation::getTexture() const
 {
 	return mSprite.getTexture();
 }
@@ -101,24 +101,24 @@ void Animation::update(sf::Time dt)
 	sf::Time timePerFrame = mDuration / static_cast<float>(mNumFrames);
 	mElapsedTime += dt;
 
-	sf::Vector2i textureBounds(mSprite.getTexture()->getSize());
+	sf::Vector2i textureBounds(mSprite.getTexture().getSize());
 	sf::IntRect textureRect = mSprite.getTextureRect();
 
 	if (mCurrentFrame == 0)
-		textureRect = sf::IntRect(0, 0, mFrameSize.x, mFrameSize.y);
+		textureRect = sf::IntRect({0, 0}, {mFrameSize.x, mFrameSize.y});
 	
 	// While we have a frame to process
 	while (mElapsedTime >= timePerFrame && (mCurrentFrame <= mNumFrames || mRepeat))
 	{
 		// Move the texture rect left
-		textureRect.left += textureRect.width;
+		textureRect.position.x += textureRect.size.x;
 
 		// If we reach the end of the texture
-		if (textureRect.left + textureRect.width > textureBounds.x)
+		if (textureRect.position.x + textureRect.size.x > textureBounds.x)
 		{
 			// Move it down one line
-			textureRect.left = 0;
-			textureRect.top += textureRect.height;
+			textureRect.position.x = 0;
+			textureRect.position.y += textureRect.size.y;
 		}
 
 		// And progress to next frame
@@ -128,7 +128,7 @@ void Animation::update(sf::Time dt)
 			mCurrentFrame = (mCurrentFrame + 1) % mNumFrames;
 
 			if (mCurrentFrame == 0)
-				textureRect = sf::IntRect(0, 0, mFrameSize.x, mFrameSize.y);
+				textureRect = sf::IntRect({0, 0}, {mFrameSize.x, mFrameSize.y});
 		}
 		else
 		{

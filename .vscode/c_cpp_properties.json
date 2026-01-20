@@ -1,0 +1,34 @@
+{
+    "configurations": [
+        {
+            "name": "Win32-MSVC",
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "UNICODE",
+                "_UNICODE",
+                "_MSC_VER",
+                "_WIN32",
+                "_WINDOWS",
+                "NOMINMAX",
+                "_CRT_SECURE_NO_DEPRECATE",
+                "_USE_MATH_DEFINES"
+            ],
+            "compilerPath": "D:/00Program/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe",
+            "cStandard": "c23",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "windows-msvc-x64",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/**"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
+        }
+    ],
+    "version": 4
+}

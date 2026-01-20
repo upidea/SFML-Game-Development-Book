@@ -2,6 +2,7 @@
 #define BOOK_ENTITY_HPP
 
 #include <Book/SceneNode.hpp>
+#include <Book/CommandQueue.hpp>
 
 
 class Entity : public SceneNode

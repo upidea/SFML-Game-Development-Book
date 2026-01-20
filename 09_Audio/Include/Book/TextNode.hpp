@@ -7,12 +7,13 @@
 
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
 
 
 class TextNode : public SceneNode
 {
 	public:
-		explicit			TextNode(const FontHolder& fonts, const std::string& text);
+		explicit			TextNode(const std::string& text);
 
 		void				setString(const std::string& text);
 
@@ -23,6 +24,7 @@ class TextNode : public SceneNode
 
 	private:
 		sf::Text			mText;
+		sf::Font			mFont;
 };
 
 #endif // BOOK_TEXTNODE_HPP

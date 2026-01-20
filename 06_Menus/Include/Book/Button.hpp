@@ -26,7 +26,7 @@ class Button : public Component
 
 
 	public:
-								Button(const FontHolder& fonts, const TextureHolder& textures);
+								Button(const TextureHolder& textures);
 
         void					setCallback(Callback callback);
         void					setText(const std::string& text);
@@ -52,6 +52,7 @@ class Button : public Component
         const sf::Texture&		mSelectedTexture;
         const sf::Texture&		mPressedTexture;
         sf::Sprite				mSprite;
+        sf::Font                mFont;
         sf::Text				mText;
         bool					mIsToggle;
 };

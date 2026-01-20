@@ -24,7 +24,7 @@ class Aircraft : public Entity
 
 
 	public:
-								Aircraft(Type type, const TextureHolder& textures, const FontHolder& fonts);
+								Aircraft(Type type, const TextureHolder& textures);
 
 		virtual unsigned int	getCategory() const;
 		virtual sf::FloatRect	getBoundingRect() const;

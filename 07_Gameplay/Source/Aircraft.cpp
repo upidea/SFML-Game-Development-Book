@@ -16,7 +16,7 @@ namespace
 	const std::vector<AircraftData> Table = initializeAircraftData();
 }
 
-Aircraft::Aircraft(Type type, const TextureHolder& textures, const FontHolder& fonts)
+Aircraft::Aircraft(Type type, const TextureHolder& textures)
 : Entity(Table[type].hitpoints)
 , mType(type)
 , mSprite(textures.get(Table[type].texture))
@@ -55,14 +55,14 @@ Aircraft::Aircraft(Type type, const TextureHolder& textures, const FontHolder& f
 		createPickup(node, textures);
 	};
 
-	std::unique_ptr<TextNode> healthDisplay(new TextNode(fonts, ""));
+	std::unique_ptr<TextNode> healthDisplay(new TextNode(""));
 	mHealthDisplay = healthDisplay.get();
 	attachChild(std::move(healthDisplay));
 
 	if (getCategory() == Category::PlayerAircraft)
 	{
-		std::unique_ptr<TextNode> missileDisplay(new TextNode(fonts, ""));
-		missileDisplay->setPosition(0, 70);
+		std::unique_ptr<TextNode> missileDisplay(new TextNode(""));
+		missileDisplay->setPosition({0, 70});
 		mMissileDisplay = missileDisplay.get();
 		attachChild(std::move(missileDisplay));
 	}
@@ -244,7 +244,7 @@ void Aircraft::createProjectile(SceneNode& node, Projectile::Type type, float xO
 {
 	std::unique_ptr<Projectile> projectile(new Projectile(type, textures));
 
-	sf::Vector2f offset(xOffset * mSprite.getGlobalBounds().width, yOffset * mSprite.getGlobalBounds().height);
+	sf::Vector2f offset(xOffset * mSprite.getGlobalBounds().size.x, yOffset * mSprite.getGlobalBounds().size.y);
 	sf::Vector2f velocity(0, projectile->getMaxSpeed());
 
 	float sign = isAllied() ? -1.f : +1.f;
@@ -266,7 +266,7 @@ void Aircraft::createPickup(SceneNode& node, const TextureHolder& textures) cons
 void Aircraft::updateTexts()
 {
 	mHealthDisplay->setString(toString(getHitpoints()) + " HP");
-	mHealthDisplay->setPosition(0.f, 50.f);
+	mHealthDisplay->setPosition({0.f, 50.f});
 	mHealthDisplay->setRotation(-getRotation());
 
 	if (mMissileDisplay)

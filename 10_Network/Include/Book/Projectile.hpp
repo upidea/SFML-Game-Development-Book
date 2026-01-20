@@ -3,8 +3,12 @@
 
 #include <Book/Entity.hpp>
 #include <Book/ResourceIdentifiers.hpp>
+#include <Book/CommandQueue.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
+#include <SFML/System/Angle.hpp>
+
 
 
 class Projectile : public Entity

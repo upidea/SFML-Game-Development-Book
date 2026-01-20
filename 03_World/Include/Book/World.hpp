@@ -7,7 +7,6 @@
 #include <Book/SpriteNode.hpp>
 #include <Book/Aircraft.hpp>
 
-#include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/View.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
@@ -20,7 +19,7 @@ namespace sf
 	class RenderWindow;
 }
 
-class World : private sf::NonCopyable
+class World
 {
 	public:
 		explicit							World(sf::RenderWindow& window);

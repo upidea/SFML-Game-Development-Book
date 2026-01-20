@@ -1,6 +1,8 @@
 #ifndef BOOK_RESOURCEIDENTIFIERS_HPP
 #define BOOK_RESOURCEIDENTIFIERS_HPP
 
+#include <SFML/Graphics/Font.hpp>
+
 
 // Forward declaration of SFML classes
 namespace sf

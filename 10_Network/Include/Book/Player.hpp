@@ -4,7 +4,6 @@
 #include <Book/Command.hpp>
 #include <Book/KeyBinding.hpp>
 
-#include <SFML/System/NonCopyable.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Network/TcpSocket.hpp>
 
@@ -13,7 +12,7 @@
 
 class CommandQueue;
 
-class Player : private sf::NonCopyable
+class Player
 {
 	public:
 		typedef PlayerAction::Type Action;
@@ -27,7 +26,7 @@ class Player : private sf::NonCopyable
 
 
 	public:
-								Player(sf::TcpSocket* socket, sf::Int32 identifier, const KeyBinding* binding);
+								Player(sf::TcpSocket* socket, int identifier, const KeyBinding* binding);
 
 		void					handleEvent(const sf::Event& event, CommandQueue& commands);
 		void					handleRealtimeInput(CommandQueue& commands);

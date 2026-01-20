@@ -11,7 +11,6 @@
 #include <Book/BloomEffect.hpp>
 #include <Book/SoundPlayer.hpp>
 
-#include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/View.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
@@ -25,10 +24,10 @@ namespace sf
 	class RenderTarget;
 }
 
-class World : private sf::NonCopyable
+class World
 {
 	public:
-											World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sounds);
+											World(sf::RenderTarget& outputTarget, SoundPlayer& sounds);
 		void								update(sf::Time dt);
 		void								draw();
 		
@@ -84,7 +83,6 @@ class World : private sf::NonCopyable
 		sf::RenderTexture					mSceneTexture;
 		sf::View							mWorldView;
 		TextureHolder						mTextures;
-		FontHolder&							mFonts;
 		SoundPlayer&						mSounds;
 
 		SceneNode							mSceneGraph;

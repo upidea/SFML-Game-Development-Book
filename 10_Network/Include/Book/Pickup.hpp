@@ -6,7 +6,7 @@
 #include <Book/ResourceIdentifiers.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
-
+#include <SFML/Graphics/RenderStates.hpp>
 
 class Aircraft;
 

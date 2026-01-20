@@ -30,22 +30,24 @@ bool Container::isSelectable() const
 
 void Container::handleEvent(const sf::Event& event)
 {
-    // If we have selected a child then give it events
+	const auto* keyEvent = event.getIf<sf::Event::KeyReleased>();
+
+	// If we have selected a child then give it events
 	if (hasSelection() && mChildren[mSelectedChild]->isActive())
 	{
 		mChildren[mSelectedChild]->handleEvent(event);
 	}
-	else if (event.type == sf::Event::KeyReleased)
+	else if (keyEvent != nullptr)
 	{
-		if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
+		if (keyEvent->code == sf::Keyboard::Key::W || keyEvent->code == sf::Keyboard::Key::Up)
 		{
 			selectPrevious();
 		}
-		else if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
+		else if (keyEvent->code == sf::Keyboard::Key::S || keyEvent->code == sf::Keyboard::Key::Down)
 		{
 			selectNext();
 		}
-		else if (event.key.code == sf::Keyboard::Return || event.key.code == sf::Keyboard::Space)
+		else if (keyEvent->code == sf::Keyboard::Key::Enter || keyEvent->code == sf::Keyboard::Key::Space)
 		{
 			if (hasSelection())
 				mChildren[mSelectedChild]->activate();
